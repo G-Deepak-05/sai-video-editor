@@ -3,8 +3,8 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { PreviewVideo } from "./PreviewVideo";
 import { Magnetic } from "./Magnetic";
-import { useViewer } from "./Shell";
-import { hero, projects } from "@/lib/projects";
+import { useProjects, useViewer } from "./Shell";
+import { hero } from "@/lib/projects";
 import { site } from "@/lib/site";
 import { LOADER_MS } from "./Loader";
 
@@ -13,6 +13,7 @@ const D = LOADER_MS / 1000 - 0.3;
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const { open } = useViewer();
+  const projects = useProjects();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);

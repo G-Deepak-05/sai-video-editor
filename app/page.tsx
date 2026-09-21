@@ -14,9 +14,10 @@ import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { site } from "@/lib/site";
-import { projects } from "@/lib/projects";
+import { getProjects } from "@/lib/data";
 
-export default function Home() {
+export default async function Home() {
+  const projects = await getProjects();
   const ld = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -32,7 +33,7 @@ export default function Home() {
     subjectOf: projects.map((p) => ({ "@type": "VideoObject", name: p.title, description: p.description, thumbnailUrl: `${site.url}${p.poster}` })),
   };
   return (
-    <Shell>
+    <Shell projects={projects}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <Navbar />
       <main>
@@ -44,7 +45,7 @@ export default function Home() {
         <Services />
         <Craft />
         <Stack />
-        <Feed />
+        <Feed projects={projects} />
         <About />
         <Testimonials />
         <Contact />

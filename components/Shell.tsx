@@ -6,13 +6,17 @@ import { Scroller } from "./Scroller";
 import { ScrollFeedback } from "./ScrollFeedback";
 import { Loader } from "./Loader";
 import { ProjectViewer } from "./ProjectViewer";
-import { projects } from "@/lib/projects";
+import type { Project } from "@/lib/projects";
 
 type Ctx = { open: (id: string, list?: string[]) => void };
 const ViewerCtx = createContext<Ctx>({ open: () => {} });
 export const useViewer = () => useContext(ViewerCtx);
 
-export function Shell({ children }: { children: React.ReactNode }) {
+const ProjectsCtx = createContext<Project[]>([]);
+/** Live project list (from R2, or the built-in defaults). */
+export const useProjects = () => useContext(ProjectsCtx);
+
+export function Shell({ children, projects }: { children: React.ReactNode; projects: Project[] }) {
   const [state, setState] = useState<{ ids: string[]; index: number } | null>(null);
 
   useEffect(() => {
@@ -28,9 +32,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const open = useCallback((id: string, list?: string[]) => {
     const ids = list && list.length ? list : projects.map((p) => p.id);
     setState({ ids, index: Math.max(0, ids.indexOf(id)) });
-  }, []);
+  }, [projects]);
 
   return (
+    <ProjectsCtx.Provider value={projects}>
     <ViewerCtx.Provider value={{ open }}>
       <Loader />
       <Cursor />
@@ -46,5 +51,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
         />
       )}
     </ViewerCtx.Provider>
+    </ProjectsCtx.Provider>
   );
 }

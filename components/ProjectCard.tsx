@@ -36,7 +36,16 @@ export function ProjectCard({ project: p, index, onOpen }: { project: Project; i
       <button ref={frame} onClick={onOpen} data-cursor="VIEW" aria-label={`Open project: ${p.title}`} className="group relative block w-full overflow-hidden bg-[var(--bg-2)] text-left">
         <motion.div style={{ clipPath: clip }} className={portrait ? "aspect-[9/14]" : "aspect-video"}>
           <motion.div style={{ scale: inner, y: shift }} className="h-full w-full">
-            <PreviewVideo src={p.preview} poster={p.poster} className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[var(--ease)] group-hover:scale-[1.06]" />
+            {p.preview ? (
+              <PreviewVideo src={p.preview} poster={p.poster} className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[var(--ease)] group-hover:scale-[1.06]" />
+            ) : (
+              // uploaded via admin without a preview clip: poster + play badge
+              <div className="relative h-full w-full">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.poster} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[var(--ease)] group-hover:scale-[1.06]" />
+                <span className="absolute inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full bg-black/60 text-xl backdrop-blur-sm" aria-hidden>▶</span>
+              </div>
+            )}
           </motion.div>
         </motion.div>
         <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent p-5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100 max-md:opacity-100 max-md:from-black/40">

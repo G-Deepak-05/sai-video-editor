@@ -1,11 +1,12 @@
 "use client";
 import { useEffect } from "react";
 import { motion } from "motion/react";
-import { projects } from "@/lib/projects";
+import { useProjects } from "./Shell";
 import { services } from "@/lib/site";
 
 export function ProjectViewer({ ids, index, onIndex, onClose }: { ids: string[]; index: number; onIndex: (i: number) => void; onClose: () => void }) {
-  const p = projects.find((x) => x.id === ids[index])!;
+  const projects = useProjects();
+  const p = projects.find((x) => x.id === ids[index]) ?? projects[0];
   const n = ids.length;
   const go = (d: number) => onIndex((index + d + n) % n);
 

@@ -6,7 +6,7 @@ export type Project = {
   categories: ServiceId[];
   description: string;
   orientation: "landscape" | "portrait";
-  preview: string; // short muted loop
+  preview?: string; // short muted loop (optional — admin uploads only need a poster)
   poster: string;
   /**
    * Full-length video. Swap `src` for a CDN URL (R2, Bunny, Mux, S3…) when ready and the
@@ -23,7 +23,8 @@ const v = (name: string) => `${VIDEO_BASE}/${name}.mp4`;
 const p = (n: number) => ({ preview: `/work/${n}.mp4`, poster: `/work/${n}.jpg` });
 
 // Categories were assigned from reviewing the delivered files; adjust here, the UI follows.
-export const projects: Project[] = [
+/** Built-in defaults; used until an admin saves data/projects.json to R2. */
+export const seedProjects: Project[] = [
   { id: "corporate-launch", title: "Office Launch Story", categories: ["candid", "long-form"], description: "I cut this multi-camera event story for atmosphere and flow.", orientation: "landscape", ...p(9), src: v("corporate-launch"), driveId: "1JpkOoLR75JOkrVNQSM04rSzw-TRp2rfY" },
   { id: "workshop-ad", title: "Speed Reading Workshop Ad", categories: ["ads"], description: "A speaker-led promo where I used bold titles to drive sign-ups.", orientation: "landscape", ...p(6), src: v("workshop-ad"), driveId: "1SUCvbNrVaLp2udaBYVQ6jO6DVvddH5GT" },
   { id: "space-tour", title: "Office Space Tour", categories: ["real-estate"], description: "A workspace walkthrough I paced with clean transitions and simple location titles.", orientation: "landscape", ...p(8), src: v("space-tour"), driveId: "1r22IphDgFv4JXVyz52DSwuddhIrIt7eH" },
@@ -36,4 +37,5 @@ export const projects: Project[] = [
   { id: "office-candid", title: "Office Moments", categories: ["candid"], description: "Behind-the-scenes moments I cut into a short story.", orientation: "landscape", ...p(7), src: v("office-candid"), driveId: "1qr60FqtAL5Ez494ebGSuJlp269KeKYsa" },
 ];
 
-export const hero = projects[4];
+/** The hero uses bundled local assets (fast LCP), so it stays a fixed seed project. */
+export const hero = seedProjects.find((p) => p.id === "dance-event")! as Project & { preview: string };

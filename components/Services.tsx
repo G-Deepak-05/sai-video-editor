@@ -2,14 +2,14 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { services } from "@/lib/site";
-import { projects } from "@/lib/projects";
 import { PreviewVideo } from "./PreviewVideo";
 import { Lines } from "./Reveal";
-import { useViewer } from "./Shell";
+import { useProjects, useViewer } from "./Shell";
 
 export function Services() {
   const [active, setActive] = useState<string>(services[0].id);
   const { open } = useViewer();
+  const projects = useProjects();
   const s = services.find((x) => x.id === active)!;
   // Preview comes from real work only; a service with no matching clip shows text alone.
   const clip = projects.find((p) => p.categories.includes(s.id));
@@ -43,7 +43,12 @@ export function Services() {
               <motion.div key={s.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
                 {clip && (
                   <button onClick={() => open(clip.id, projects.filter((p) => p.categories.includes(s.id)).map((p) => p.id))} data-cursor="PLAY" className="relative mb-6 block aspect-video w-full overflow-hidden bg-black" aria-label={`Watch ${s.label} example`}>
-                    <PreviewVideo src={clip.preview} poster={clip.poster} eager className="h-full w-full object-cover" />
+                    {clip.preview ? (
+                      <PreviewVideo src={clip.preview} poster={clip.poster} eager className="h-full w-full object-cover" />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={clip.poster} alt="" className="h-full w-full object-cover" />
+                    )}
                   </button>
                 )}
                 <p className="text-lg text-[var(--fg)]/85">{s.blurb}</p>

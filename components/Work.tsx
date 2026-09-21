@@ -1,20 +1,20 @@
 "use client";
 import { useMemo, useState } from "react";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
-import { projects } from "@/lib/projects";
 import { services } from "@/lib/site";
 import { ProjectCard } from "./ProjectCard";
 import { Lines } from "./Reveal";
-import { useViewer } from "./Shell";
+import { useProjects, useViewer } from "./Shell";
 
 export function Work() {
   const [filter, setFilter] = useState<string>("all");
   const { open } = useViewer();
+  const projects = useProjects();
 
   // Only categories that at least one real project supports.
   const filters = useMemo(
     () => [{ id: "all", label: "All" }, ...services.filter((s) => projects.some((p) => p.categories.includes(s.id))).map((s) => ({ id: s.id, label: s.label }))],
-    [],
+    [projects],
   );
   const list = filter === "all" ? projects : projects.filter((p) => p.categories.includes(filter as never));
   const ids = list.map((p) => p.id);

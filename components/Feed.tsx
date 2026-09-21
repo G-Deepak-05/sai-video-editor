@@ -1,4 +1,4 @@
-import { projects } from "@/lib/projects";
+import type { Project } from "@/lib/projects";
 import { site } from "@/lib/site";
 import { Lines } from "./Reveal";
 import { Magnetic } from "./Magnetic";
@@ -7,8 +7,9 @@ import { Magnetic } from "./Magnetic";
  * No Instagram URL/content was supplied, so this is a static curated strip of the portfolio
  * posters. The CTA only appears once site.contact.instagram is set.
  */
-export function Feed() {
-  const picks = [projects.find((p) => p.id === "hook-reel")!, ...projects.filter((p) => p.orientation === "landscape").slice(0, 4)];
+export function Feed({ projects }: { projects: Project[] }) {
+  const picks = [...projects.filter((p) => p.orientation === "portrait").slice(0, 1), ...projects.filter((p) => p.orientation === "landscape").slice(0, 4)];
+  if (!picks.length) return null;
   return (
     <section className="py-[clamp(5rem,10vw,9rem)]" aria-labelledby="feed-h">
       <div className="wrap">
