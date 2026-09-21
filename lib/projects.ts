@@ -16,9 +16,12 @@ export type Project = {
   driveId?: string;
 };
 
-// Full-length videos live in Cloudflare R2. Override with NEXT_PUBLIC_VIDEO_BASE to point at another CDN.
-const VIDEO_BASE = (process.env.NEXT_PUBLIC_VIDEO_BASE || "https://pub-968e8f3cf56245f390574aeb83047ac4.r2.dev/saikumar-web-videos").replace(/\/$/, "");
-const v = (name: string) => `${VIDEO_BASE}/${name}.mp4`;
+// Full-length videos live in Cloudflare R2 (URL comes from the environment, never hard-coded).
+// NEXT_PUBLIC_VIDEO_BASE overrides; otherwise R2_PUBLIC_URL + the folder the original ten were uploaded to.
+const R2_PUBLIC = (process.env.R2_PUBLIC_URL || "").replace(/\/$/, "");
+const VIDEO_BASE = (process.env.NEXT_PUBLIC_VIDEO_BASE || (R2_PUBLIC ? `${R2_PUBLIC}/saikumar-web-videos` : "")).replace(/\/$/, "");
+// No base configured -> undefined, and the viewer falls back to the Google Drive embed.
+const v = (name: string) => (VIDEO_BASE ? `${VIDEO_BASE}/${name}.mp4` : undefined);
 
 const p = (n: number) => ({ preview: `/work/${n}.mp4`, poster: `/work/${n}.jpg` });
 
