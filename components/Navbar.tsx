@@ -17,7 +17,8 @@ export function Navbar() {
   useEffect(() => { document.body.style.overflow = open ? "hidden" : ""; }, [open]);
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${solid || open ? "bg-[#0a0a0a]/80 backdrop-blur-md" : ""}`}>
+    <>
+    <header className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${open ? "bg-[#0a0a0a]" : solid ? "bg-[#0a0a0a]/80 backdrop-blur-md" : ""}`}>
       <nav aria-label="Primary" className="wrap flex items-center justify-between py-7">
         <a href="#top" className="display text-4xl tracking-[0.12em] md:text-5xl" onClick={() => setOpen(false)}>{site.name}</a>
         <ul className="hidden gap-14 md:flex">
@@ -30,9 +31,10 @@ export function Navbar() {
           {open ? "Close" : "Menu"}
         </button>
       </nav>
+    </header>
       <AnimatePresence>
         {open && (
-          <motion.div id="mobile-menu" className="wrap fixed inset-0 top-[92px] flex flex-col justify-center gap-4 bg-[#0a0a0a] md:hidden"
+          <motion.div id="mobile-menu" className="wrap fixed inset-0 z-40 flex flex-col justify-center gap-5 overflow-y-auto bg-[#0a0a0a] pt-24 md:hidden"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             {links.map(([l, h], i) => (
               <motion.a key={h} href={h} onClick={() => setOpen(false)} className="display text-6xl"
@@ -43,6 +45,6 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
