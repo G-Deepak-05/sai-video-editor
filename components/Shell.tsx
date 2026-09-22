@@ -7,6 +7,8 @@ import { ScrollFeedback } from "./ScrollFeedback";
 import { Loader } from "./Loader";
 import { ProjectViewer } from "./ProjectViewer";
 import type { Project } from "@/lib/projects";
+import type { SiteContent } from "@/lib/content";
+import { defaultContent } from "@/lib/content";
 
 type Ctx = { open: (id: string, list?: string[]) => void };
 const ViewerCtx = createContext<Ctx>({ open: () => {} });
@@ -16,7 +18,11 @@ const ProjectsCtx = createContext<Project[]>([]);
 /** Live project list (from R2, or the built-in defaults). */
 export const useProjects = () => useContext(ProjectsCtx);
 
-export function Shell({ children, projects }: { children: React.ReactNode; projects: Project[] }) {
+const ContentCtx = createContext<SiteContent>(defaultContent);
+/** Live, admin-editable site copy (from R2, or the built-in defaults). */
+export const useContent = () => useContext(ContentCtx);
+
+export function Shell({ children, projects, content }: { children: React.ReactNode; projects: Project[]; content: SiteContent }) {
   const [state, setState] = useState<{ ids: string[]; index: number } | null>(null);
 
   useEffect(() => {
@@ -35,6 +41,7 @@ export function Shell({ children, projects }: { children: React.ReactNode; proje
   }, [projects]);
 
   return (
+    <ContentCtx.Provider value={content}>
     <ProjectsCtx.Provider value={projects}>
     <ViewerCtx.Provider value={{ open }}>
       <Loader />
@@ -52,5 +59,6 @@ export function Shell({ children, projects }: { children: React.ReactNode; proje
       )}
     </ViewerCtx.Provider>
     </ProjectsCtx.Provider>
+    </ContentCtx.Provider>
   );
 }

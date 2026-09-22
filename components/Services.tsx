@@ -1,26 +1,28 @@
 "use client";
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { services } from "@/lib/site";
 import { PreviewVideo } from "./PreviewVideo";
 import { Lines } from "./Reveal";
-import { useProjects, useViewer } from "./Shell";
+import { useContent, useProjects, useViewer } from "./Shell";
 
 export function Services() {
-  const [active, setActive] = useState<string>(services[0].id);
+  const { servicesHeading, services } = useContent();
+  const [active, setActive] = useState<string>(services[0]?.id ?? "");
   const { open } = useViewer();
   const projects = useProjects();
-  const s = services.find((x) => x.id === active)!;
+  const s = services.find((x) => x.id === active) ?? services[0];
   // Preview comes from real work only; a service with no matching clip shows text alone.
-  const clip = projects.find((p) => p.categories.includes(s.id));
+  const clip = s && projects.find((p) => p.categories.includes(s.id));
+
+  if (!s) return null;
 
   return (
     <section id="services" className="relative bg-[var(--bg-2)] py-[clamp(5rem,12vw,10rem)]" aria-labelledby="services-h">
       <div className="wrap">
-        <h2 id="services-h" className="display text-[clamp(3rem,9vw,9rem)]"><Lines lines={["What I edit"]} /></h2>
+        <h2 id="services-h" className="display text-[clamp(3rem,9vw,9rem)]"><Lines lines={[servicesHeading]} /></h2>
 
         <div className="mt-16 grid gap-12 lg:grid-cols-12">
-          <ul className="lg:col-span-7" onMouseLeave={() => {}}>
+          <ul className="lg:col-span-7">
             {services.map((x, i) => (
               <li key={x.id} className="border-t border-[var(--line)] last:border-b">
                 <button

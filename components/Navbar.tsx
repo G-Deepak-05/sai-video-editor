@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { site } from "@/lib/site";
+import { useContent } from "./Shell";
 
 const links = [["Work", "#work"], ["Services", "#services"], ["About", "#about"], ["Contact", "#contact"]];
 
 export function Navbar() {
+  const { name, role } = useContent();
   const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -18,15 +19,15 @@ export function Navbar() {
 
   return (
     <>
-    <header className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${open ? "bg-[#0a0a0a]" : solid ? "bg-[#0a0a0a]/80 backdrop-blur-md" : ""}`}>
+    <header className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${open ? "bg-[#0a0a0a]" : solid ? "bg-[#0a0a0a]/95 md:bg-[#0a0a0a]/80 md:backdrop-blur-md" : ""}`}>
       <nav aria-label="Primary" className="wrap flex items-center justify-between py-7">
-        <a href="#top" className="display text-4xl tracking-[0.12em] md:text-5xl" onClick={() => setOpen(false)}>{site.name}</a>
+        <a href="#top" className="display text-4xl tracking-[0.12em] md:text-5xl" onClick={() => setOpen(false)}>{name}</a>
         <ul className="hidden gap-14 md:flex">
           {links.map(([l, h]) => (
             <li key={h}><a href={h} className="u text-[1.1rem] font-bold uppercase tracking-[0.16em] text-[var(--fg)]" data-cursor="">{l}</a></li>
           ))}
         </ul>
-        <span className="hidden text-[1rem] font-bold uppercase tracking-[0.18em] text-[var(--fg)]/70 md:block">{site.role}</span>
+        <span className="hidden text-[1rem] font-bold uppercase tracking-[0.18em] text-[var(--fg)]/70 md:block">{role}</span>
         <button className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--fg)] md:hidden" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)}>
           {open ? "Close" : "Menu"}
         </button>

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { isAdmin } from "@/lib/auth";
 import { getJson } from "@/lib/r2";
-import { PROJECTS_KEY } from "@/lib/data";
+import { PROJECTS_KEY, CONTENT_KEY } from "@/lib/data";
 import { seedProjects, type Project } from "@/lib/projects";
+import { mergeContent, type SiteContent } from "@/lib/content";
 import { AdminApp } from "./AdminApp";
 import { LoginForm } from "./LoginForm";
 
@@ -12,11 +13,14 @@ export const dynamic = "force-dynamic";
 export default async function AdminPage() {
   if (!(await isAdmin())) return <LoginForm />;
   let projects: Project[] = seedProjects;
+  let content: SiteContent = mergeContent(null);
   let error = "";
   try {
-    projects = (await getJson<Project[]>(PROJECTS_KEY)) ?? seedProjects;
+    const [p, c] = await Promise.all([getJson<Project[]>(PROJECTS_KEY), getJson<Partial<SiteContent>>(CONTENT_KEY)]);
+    projects = p ?? seedProjects;
+    content = mergeContent(c);
   } catch (e) {
     error = e instanceof Error ? e.message : "Could not reach storage.";
   }
-  return <AdminApp initial={projects} storageError={error} />;
+  return <AdminApp initialProjects={projects} initialContent={content} storageError={error} />;
 }

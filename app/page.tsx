@@ -14,26 +14,26 @@ import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { site } from "@/lib/site";
-import { getProjects } from "@/lib/data";
+import { getProjects, getSiteContent } from "@/lib/data";
 
 export default async function Home() {
-  const projects = await getProjects();
+  const [projects, content] = await Promise.all([getProjects(), getSiteContent()]);
   const ld = {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: site.name,
-    jobTitle: site.role,
+    name: content.name,
+    jobTitle: content.role,
     url: site.url,
-    description: site.description,
+    description: content.seoDescription,
     knowsAbout: ["Video editing", "Reels editing", "Long-form editing", "Ad editing", "Real estate video editing", "Speed ramp editing"],
-    sameAs: [site.contact.instagram, site.contact.youtube, site.contact.linkedin].filter(Boolean),
-    image: `${site.url}/saikumar.jpg`,
-    telephone: site.contact.phone || undefined,
-    email: site.contact.email || undefined,
+    sameAs: [content.contact.instagram, content.contact.youtube, content.contact.linkedin].filter(Boolean),
+    image: content.aboutPhoto.startsWith("http") ? content.aboutPhoto : `${site.url}${content.aboutPhoto}`,
+    telephone: content.contact.phone || undefined,
+    email: content.contact.email || undefined,
     subjectOf: projects.map((p) => ({ "@type": "VideoObject", name: p.title, description: p.description, thumbnailUrl: `${site.url}${p.poster}` })),
   };
   return (
-    <Shell projects={projects}>
+    <Shell projects={projects} content={content}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <Navbar />
       <main>

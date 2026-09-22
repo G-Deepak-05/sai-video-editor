@@ -1,9 +1,63 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll, useTransform } from "motion/react";
 
-/** Scroll is the timeline: a pinned clip whose playhead is driven by scroll, with an eased "ramp" curve. */
+/**
+ * The scroll-as-timeline effect (clip-path + per-frame video seeking, pinned over 380vh) is the
+ * single heaviest thing on the page, and clip-path is a paint property, not a compositor one — doing
+ * it every scroll frame across a long pinned section is what made mobile scrolling feel worse than
+ * desktop. Phones get a plain autoplaying loop instead; desktop keeps the full scrubbed version.
+ */
 export function ScrubReel() {
+  const [desktop, setDesktop] = useState(false);
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setDesktop(!reduce && window.matchMedia("(min-width: 768px) and (hover: hover) and (pointer: fine)").matches);
+  }, []);
+  return desktop ? <ScrubReelDesktop /> : <ScrubReelMobile />;
+}
+
+function ScrubReelMobile() {
+  const box = useRef<HTMLElement>(null);
+  const vid = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const v = vid.current, sec = box.current;
+    if (!v || !sec) return;
+    let loaded = false;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          if (!loaded) { loaded = true; v.src = "/work/scrub-sm.mp4"; v.poster = "/work/scrub-sm.jpg"; v.load(); }
+          v.play().catch(() => {});
+        } else v.pause();
+      },
+      { rootMargin: "200px" },
+    );
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <section ref={box} className="relative aspect-video w-full overflow-hidden bg-black" aria-label="Speed-ramp showreel clip">
+      <video ref={vid} className="h-full w-full object-cover" muted loop playsInline preload="none" aria-hidden />
+      <div className="absolute inset-0 bg-black/30" />
+      <motion.p
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-20%" }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        className="display absolute inset-0 flex items-center justify-center text-center text-[clamp(3rem,13vw,7rem)] mix-blend-difference"
+      >
+        Cut. Ramp. Land it.
+      </motion.p>
+      <span className="label absolute bottom-5 left-5 !text-[var(--fg)]">Speed ramp — showreel</span>
+    </section>
+  );
+}
+
+/** Scroll is the timeline: a pinned clip whose playhead is driven by scroll, with an eased "ramp" curve. */
+function ScrubReelDesktop() {
   const box = useRef<HTMLElement>(null);
   const vid = useRef<HTMLVideoElement>(null);
   const tcEl = useRef<HTMLSpanElement>(null);
@@ -19,16 +73,15 @@ export function ScrubReel() {
     const v = vid.current, sec = box.current;
     if (!v || !sec) return;
     let raf = 0, cur = 0, loaded = false;
-    const small = window.matchMedia("(max-width: 767px)").matches;
 
     // Download the (all-intra, seek-friendly) clip only when the section is about to be reached.
     const io = new IntersectionObserver(([e]) => {
       near.current = e.isIntersecting;
-      if (e.isIntersecting && !loaded) { loaded = true; v.src = small ? "/work/scrub-sm.mp4" : "/work/scrub.mp4"; v.load(); }
+      if (e.isIntersecting && !loaded) { loaded = true; v.src = "/work/scrub.mp4"; v.load(); }
       if (e.isIntersecting && !raf) raf = requestAnimationFrame(loop);
     }, { rootMargin: "100% 0px" });
     io.observe(sec);
-    const pio = new IntersectionObserver(([e]) => { if (e.isIntersecting) { v.poster = small ? "/work/scrub-sm.jpg" : "/work/scrub.jpg"; pio.disconnect(); } }, { rootMargin: "100% 0px" });
+    const pio = new IntersectionObserver(([e]) => { if (e.isIntersecting) { v.poster = "/work/scrub.jpg"; pio.disconnect(); } }, { rootMargin: "100% 0px" });
     pio.observe(sec);
 
     function loop() {

@@ -1,23 +1,25 @@
-import { site } from "@/lib/site";
+"use client";
 import { Lines } from "./Reveal";
 import { Magnetic } from "./Magnetic";
+import { useContent } from "./Shell";
 
 export function Contact() {
-  const { email, instagram, whatsapp, phone, youtube, linkedin } = site.contact;
-  const primary = email ? `mailto:${email}?subject=Video%20editing%20project` : whatsapp ? `${whatsapp}?text=Hi%20Saikumar%2C%20I%20have%20a%20video%20editing%20project.` : instagram || "#contact";
+  const { contactHeading, contactSubtext, contact } = useContent();
+  const { email, instagram, whatsapp, phone, youtube, linkedin } = contact;
+  const primary = email ? `mailto:${email}?subject=Video%20editing%20project` : whatsapp ? `${whatsapp}?text=Hi%2C%20I%20have%20a%20video%20editing%20project.` : instagram || "#contact";
   const items = [
     email && { label: "Email", value: email, href: `mailto:${email}`, icon: "/logos/gmail.svg" },
     whatsapp && { label: "WhatsApp", value: "Message me", href: whatsapp, icon: "/logos/whatsapp.svg" },
     phone && { label: "Phone", value: phone, href: `tel:${phone.replace(/\s/g, "")}`, icon: "/logos/phone.svg" },
-    instagram && { label: "Instagram", value: "@its_saikumarfx", href: instagram, icon: "/logos/instagram.svg" },
+    instagram && { label: "Instagram", value: instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//, "@").replace(/\/$/, ""), href: instagram, icon: "/logos/instagram.svg" },
     youtube && { label: "YouTube", value: "Watch on YouTube", href: youtube, icon: "/logos/youtube.svg" },
     linkedin && { label: "LinkedIn", value: "Connect with me", href: linkedin, icon: "/logos/linkedin.svg" },
   ].filter(Boolean) as { label: string; value: string; href: string; icon: string }[];
 
   return (
     <section id="contact" className="wrap py-[clamp(6rem,14vw,12rem)]" aria-labelledby="contact-h">
-      <h2 id="contact-h" className="display text-[clamp(3.5rem,13vw,14rem)]"><Lines lines={["Have a story", "to tell?"]} /></h2>
-      <p className="mt-8 max-w-md text-lg text-[var(--mute)]">Have a project in mind? Let&apos;s talk — I&apos;d love to hear about it.</p>
+      <h2 id="contact-h" className="display text-[clamp(3.5rem,13vw,14rem)]"><Lines lines={contactHeading} /></h2>
+      <p className="mt-8 max-w-md text-lg text-[var(--mute)]">{contactSubtext}</p>
       <div className="mt-10">
         <Magnetic>
           <a href={primary} data-cursor="OPEN" className="group inline-flex items-center gap-3 rounded-full bg-[var(--accent)] px-8 py-5 text-sm font-semibold uppercase tracking-[0.14em] text-black">
