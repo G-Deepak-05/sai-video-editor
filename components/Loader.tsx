@@ -1,21 +1,28 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { hasSeenLoader, markLoaderSeen } from "@/lib/loaderSeen";
 
-/** Film-leader countdown: sweeping hand, 3‑2‑1, frame counter, then a two-piece "cut" reveal. */
+/** Film-leader countdown: sweeping hand, 3‑2‑1, frame counter, then a two-piece "cut" reveal. Plays once per visitor. */
 export const LOADER_MS = 2400;
 
 export function Loader() {
   const [show, setShow] = useState(true);
   const [t, setT] = useState(0);
 
+  // Runs before the browser paints, so a returning visitor never sees so much as a flash of it.
+  useLayoutEffect(() => {
+    if (hasSeenLoader()) setShow(false);
+  }, []);
+
   useEffect(() => {
+    if (!show) return;
     // ~12 updates/sec instead of per-frame renders; the sweep itself is a pure CSS animation
     const start = performance.now();
     const iv = setInterval(() => setT(Math.min((performance.now() - start) / (LOADER_MS - 500), 1)), 80);
-    const done = setTimeout(() => setShow(false), LOADER_MS);
+    const done = setTimeout(() => { markLoaderSeen(); setShow(false); }, LOADER_MS);
     return () => { clearInterval(iv); clearTimeout(done); };
-  }, []);
+  }, [show]);
 
   const count = Math.max(1, 3 - Math.floor(t * 3));
   const frames = Math.floor(t * 72); // 3 seconds @ 24fps
@@ -36,7 +43,7 @@ export function Loader() {
   return (
     <AnimatePresence>
       {show && (
-        <motion.div className="fixed inset-0 z-[100]" aria-hidden exit={{ transition: { duration: 0.9 } }}>
+        <motion.div data-loader-root className="fixed inset-0 z-[100]" aria-hidden exit={{ transition: { duration: 0.9 } }}>
           {half(true)}
           {half(false)}
           {/* the cut line */}

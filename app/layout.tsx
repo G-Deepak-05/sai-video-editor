@@ -20,10 +20,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const viewport: Viewport = { themeColor: "#0a0a0a" };
 
+// The Loader plays a countdown on a first visit only (see lib/loaderSeen.ts). That check is a
+// localStorage read, which the server can't do — so the server-rendered HTML always includes the
+// countdown, and normally React would only hide it after hydrating, a few hundred ms into a
+// reload, showing a flash of it every time. This blocking inline script runs before the browser
+// paints anything below it, so a returning visitor's very first paint already has it hidden —
+// the same technique sites use to avoid a light-mode flash before a dark theme applies.
+const HIDE_LOADER_IF_SEEN = `try{if(localStorage.getItem('saikumar-seen-loader-v1')==='1')document.documentElement.classList.add('loader-seen')}catch(e){}`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
-      <body className="grain">{children}</body>
+      <body className="grain">
+        <script dangerouslySetInnerHTML={{ __html: HIDE_LOADER_IF_SEEN }} />
+        <style>{`html.loader-seen [data-loader-root]{display:none!important}`}</style>
+        {children}
+      </body>
     </html>
   );
 }

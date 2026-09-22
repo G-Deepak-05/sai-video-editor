@@ -1,19 +1,22 @@
 "use client";
 import { motion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { PreviewVideo } from "./PreviewVideo";
 import { Magnetic } from "./Magnetic";
 import { useContent, useProjects, useViewer } from "./Shell";
 import { hero } from "@/lib/projects";
 import { LOADER_MS } from "./Loader";
-
-const D = LOADER_MS / 1000 - 0.3;
+import { hasSeenLoader } from "@/lib/loaderSeen";
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const { open } = useViewer();
   const projects = useProjects();
   const { role, heroTagline, heroCtaPrimary, heroCtaSecondary } = useContent();
+  // Waits out the countdown loader on a first visit; on a returning one it's already been shown,
+  // so there's nothing to wait for — these run right away instead of a couple of dead seconds.
+  const [D, setD] = useState(LOADER_MS / 1000 - 0.3);
+  useLayoutEffect(() => { if (hasSeenLoader()) setD(0.1); }, []);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
