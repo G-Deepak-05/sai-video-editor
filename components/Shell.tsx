@@ -4,6 +4,7 @@ import Lenis from "lenis";
 import { Cursor } from "./Cursor";
 import { Scroller } from "./Scroller";
 import { ScrollFeedback } from "./ScrollFeedback";
+import { OfflineNotice } from "./OfflineNotice";
 import { Loader } from "./Loader";
 import { ProjectViewer } from "./ProjectViewer";
 import type { Project } from "@/lib/projects";
@@ -48,6 +49,7 @@ export function Shell({ children, projects, content }: { children: React.ReactNo
       <Cursor />
       <Scroller />
       <ScrollFeedback />
+      <OfflineNotice />
       {children}
       {state && (
         <ProjectViewer

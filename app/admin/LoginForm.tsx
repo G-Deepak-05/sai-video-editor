@@ -10,7 +10,8 @@ export function LoginForm() {
     e.preventDefault();
     setBusy(true); setErr("");
     const res = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: pw }) });
-    if (res.ok) location.reload();
+    // Success, or locked out: reload so the server re-renders (the lockout then shows the real 403 page).
+    if (res.ok || res.status === 429) location.reload();
     else { setErr((await res.json().catch(() => ({}))).error || "Login failed."); setBusy(false); }
   }
 

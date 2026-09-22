@@ -4,6 +4,7 @@ import type { Project } from "@/lib/projects";
 import type { SiteContent } from "@/lib/content";
 import { ProjectsPanel } from "./ProjectsPanel";
 import { ContentPanel } from "./ContentPanel";
+import { OfflineNotice } from "@/components/OfflineNotice";
 
 export function AdminApp({ initialProjects, initialContent, storageError }: { initialProjects: Project[]; initialContent: SiteContent; storageError: string }) {
   const [tab, setTab] = useState<"projects" | "content">("projects");
@@ -12,6 +13,7 @@ export function AdminApp({ initialProjects, initialContent, storageError }: { in
 
   return (
     <main className="mx-auto max-w-5xl px-5 pt-10 md:px-8">
+      <OfflineNotice />
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="label">Admin</p>

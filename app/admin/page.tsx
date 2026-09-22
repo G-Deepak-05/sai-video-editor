@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { isAdmin } from "@/lib/auth";
+import { forbidden } from "next/navigation";
+import { isAdmin, isLockedOut } from "@/lib/auth";
 import { getJson } from "@/lib/r2";
 import { PROJECTS_KEY, CONTENT_KEY } from "@/lib/data";
 import { seedProjects, type Project } from "@/lib/projects";
@@ -11,7 +12,11 @@ export const metadata: Metadata = { title: "Admin", robots: { index: false, foll
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  if (!(await isAdmin())) return <LoginForm />;
+  if (!(await isAdmin())) {
+    // Too many failed attempts from this browser: show the real 403 instead of another login form.
+    if (await isLockedOut()) forbidden();
+    return <LoginForm />;
+  }
   let projects: Project[] = seedProjects;
   let content: SiteContent = mergeContent(null);
   let error = "";
