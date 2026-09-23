@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { motion } from "motion/react";
 import { useContent, useProjects } from "./Shell";
+import { VideoPlayer } from "./VideoPlayer";
 
 export function ProjectViewer({ ids, index, onIndex, onClose }: { ids: string[]; index: number; onIndex: (i: number) => void; onClose: () => void }) {
   const projects = useProjects();
@@ -36,7 +37,7 @@ export function ProjectViewer({ ids, index, onIndex, onClose }: { ids: string[];
         <div className={`flex min-h-0 items-center justify-center bg-black ${p.orientation === "portrait" ? "lg:w-[38%]" : "lg:flex-1"}`}>
           <div className={p.orientation === "portrait" ? "aspect-[9/16] max-h-[78vh]" : "aspect-video w-full"} key={p.id}>
             {p.src ? (
-              <video className="h-full w-full" src={p.src} poster={p.poster} controls autoPlay playsInline preload="metadata" />
+              <VideoPlayer src={p.src} poster={p.poster} title={p.title} />
             ) : p.driveId ? (
               <iframe className="h-full w-full" src={`https://drive.google.com/file/d/${p.driveId}/preview`} title={p.title} allow="autoplay; fullscreen" allowFullScreen />
             ) : (

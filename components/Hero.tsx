@@ -29,7 +29,7 @@ export function Hero() {
     <section id="top" ref={ref} className="relative isolate flex min-h-[100svh] items-end overflow-hidden">
       <motion.div style={{ scale, y }} className="absolute inset-0 -z-10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={hero.poster} srcSet="/work/10-sm.jpg 720w, /work/10.jpg 1440w" sizes="100vw" alt="" fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={hero.poster} srcSet="/work/10-sm.jpg 900w, /work/10.jpg 1600w" sizes="100vw" alt="" fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
         <PreviewVideo src={hero.preview} srcSmall="/work/10-sm.mp4" eager className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-[#0a0a0a]/50" />
       </motion.div>

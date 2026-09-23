@@ -30,7 +30,10 @@ const HIDE_LOADER_IF_SEEN = `try{if(localStorage.getItem('saikumar-seen-loader-v
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable}`}>
+    // suppressHydrationWarning: the inline script below intentionally adds a class to this
+    // element before React hydrates (see HIDE_LOADER_IF_SEEN) — without this flag React treats
+    // that as a mismatch and logs a hydration error, even though the mutation is expected.
+    <html lang="en" className={`${display.variable} ${sans.variable}`} suppressHydrationWarning>
       <body className="grain">
         <script dangerouslySetInnerHTML={{ __html: HIDE_LOADER_IF_SEEN }} />
         <style>{`html.loader-seen [data-loader-root]{display:none!important}`}</style>
